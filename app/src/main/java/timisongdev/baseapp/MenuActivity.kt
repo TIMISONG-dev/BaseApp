@@ -131,7 +131,7 @@ fun GridItem(title: String, desc: String, cost: String, image: String) {
                     contentDescription = "",
                     Modifier
                         .size(180.dp)
-                        .scale(1.3f)
+                        .scale(1.5f)
                 )
                 Column (
                     Modifier
