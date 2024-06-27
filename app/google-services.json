@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "113228342155",
+    "firebase_url": "https://testbase-710d4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "testbase-710d4",
+    "storage_bucket": "testbase-710d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113228342155:android:6d3753a3c392dd8c46858e",
+        "android_client_info": {
+          "package_name": "timisongdev.baseapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmY9FCexOIqCYkZqbDMlKWjUZyGvac8mQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
