@@ -7,11 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -21,7 +23,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,14 +77,15 @@ class MenuActivity : ComponentActivity() {
                         "https://avatars.mds.yandex.net/get-mpic/11552111/2a0000018d55c4121d072ef088a5efea1d68/600x800"
                     )
                     Column {
-
                         var selectedItem by remember { mutableIntStateOf(0) }
                         val titles = listOf("Home", "Favorite", "Cart", "Settings")
                         val icons = listOf(Icons.Outlined.Home, Icons.Outlined.FavoriteBorder, Icons.Outlined.ShoppingCart, Icons.Outlined.Settings)
                         // Sorry for this code
 
                         Column (
-                            Modifier.weight(1F)
+                            Modifier
+                                .weight(1F)
+                                .background(MaterialTheme.colorScheme.inverseOnSurface)
                         ){
                             when(selectedItem){
                                 0 -> MyGrid(title = title, desc = desc, cost = cost, image = image)
@@ -113,7 +118,9 @@ class MenuActivity : ComponentActivity() {
 @Composable
 fun Fav(){
     Column (
-        Modifier.fillMaxHeight().fillMaxWidth(),
+        Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -127,7 +134,9 @@ fun Fav(){
 @Composable
 fun Cart(){
     Column (
-        Modifier.fillMaxHeight().fillMaxWidth(),
+        Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -141,7 +150,9 @@ fun Cart(){
 @Composable
 fun Settings(){
     Column (
-        Modifier.fillMaxHeight().fillMaxWidth(),
+        Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -155,14 +166,14 @@ fun Settings(){
 @Composable
 fun MyGrid(title: List<String>, desc: List<String>, cost: List<String>, image: List<String>) {
     Column {
-        Row (
+        Row(
             Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(24.dp, 44.dp, 24.dp, 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Absolute.Left
-        ){
+        ) {
             Icon(
                 Icons.Outlined.Person,
                 contentDescription = ""
@@ -185,30 +196,37 @@ fun MyGrid(title: List<String>, desc: List<String>, cost: List<String>, image: L
                     title = title[index],
                     desc = desc[index],
                     cost = cost[index],
-                    image = image[index]
+                    image = image[index],
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GridItem(title: String, desc: String, cost: String, image: String) {
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
                 elevation = 8.dp,
                 ambientColor = Color.Transparent,
-                spotColor = Color.LightGray
+                spotColor = MaterialTheme.colorScheme.inverseOnSurface
             )
-            .aspectRatio(0.6f),
+            .aspectRatio(0.6f)
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
+                .clickable {
+                    showBottomSheet = true
+                }
         ) {
             Column (
                 Modifier.wrapContentHeight(),
@@ -227,7 +245,7 @@ fun GridItem(title: String, desc: String, cost: String, image: String) {
                         .fillMaxWidth()
                         .weight(1f)
                         .clip(RoundedCornerShape(16.dp, 16.dp, 0.dp, 0.dp))
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(10.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -237,11 +255,12 @@ fun GridItem(title: String, desc: String, cost: String, image: String) {
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         maxLines = 1,
+                        color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = desc,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -269,6 +288,115 @@ fun GridItem(title: String, desc: String, cost: String, image: String) {
                             contentDescription = "",
                             Modifier
                                 .size(24.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState
+        ) {
+            // Sheet content
+            Column (
+                Modifier
+                    .wrapContentHeight()
+                    .wrapContentWidth()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Image(
+                    painter = rememberAsyncImagePainter(model = image),
+                    contentDescription = "Image",
+                    Modifier
+                        .size(250.dp)
+
+                )
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = desc,
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = cost,
+                    color = Color(0xFF19941b),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.padding(24.dp))
+                Column (
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                ){
+                    Text(
+                        text = "Типа отзывы: ",
+                        Modifier.padding(8.dp),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Типа ник",
+                        Modifier.padding(8.dp, 8.dp, 8.dp, 4.dp),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "Типа отзыв",
+                        Modifier.padding(8.dp, 4.dp, 8.dp, 8.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                }
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ){
+                    Button(
+                        onClick = {
+
+                        }
+                    ) {
+                        Icon(
+                            Icons.Outlined.ShoppingCart,
+                            contentDescription = "Buy"
+                        )
+                        Text(
+                            text = "Buy",
+                            fontSize = 18.sp
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(100.dp))
+                            .background(MaterialTheme.colorScheme.errorContainer)
+                            .clickable {
+
+                            }
+                    ){
+                        Icon(
+                            Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Fav",
+                            Modifier
+                                .padding(8.dp)
                         )
                     }
                 }
